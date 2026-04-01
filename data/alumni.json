@@ -1,0 +1,19 @@
+[
+  {
+    "id": "35a06370-e3c8-422f-8e76-0dcbb28f0ac3",
+    "nama": "aSDa",
+    "nim": "asfa",
+    "jurusan": "ADasd",
+    "tahunLulus": 2027,
+    "email": "asfas@gmail.com",
+    "noHp": "",
+    "createdAt": "2026-03-31T18:31:39.732Z",
+    "updatedAt": "2026-03-31T18:31:42.658Z",
+    "lastTracking": {
+      "pekerjaan": "Software Engineer",
+      "perusahaan": "Telkom Indonesia",
+      "sumber": "Google Scholar",
+      "trackedAt": "2026-03-31T18:31:42.657Z"
+    }
+  }
+]

@@ -1,0 +1,15 @@
+body {
+  background: var(--bs-body-bg);
+}
+
+#trackingCard .placeholder {
+  color: var(--bs-secondary-color);
+}
+
+.table td, .table th {
+  vertical-align: middle;
+}
+
+.btn-track {
+  min-width: 120px;
+}
