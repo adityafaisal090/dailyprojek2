@@ -92,20 +92,9 @@ npm run dev
 
 ## Link Deploy
 
-- (isi setelah deploy) https://<nama-service>.onrender.com
+- GitHub Pages (frontend saja): https://adityafaisal090.github.io/dailyprojek2/
 
-## Cara Deploy (Render)
-
-Proyek ini menjalankan Express (API + frontend statis), jadi paling mudah dipublish sebagai **Web Service**.
-
-1. Buka https://render.com lalu login.
-2. Klik **New** → **Blueprint**.
-3. Hubungkan repo GitHub kamu: `adityafaisal090/dailyprojek2`.
-4. Render akan mendeteksi file `render.yaml` dan menyiapkan service otomatis.
-5. Klik **Apply** / **Deploy**.
-6. Setelah selesai, kamu akan dapat URL publik seperti: `https://dailyprojek2.onrender.com` (contoh).
-
-Catatan: data disimpan di file `data/alumni.json`. Di hosting seperti Render, penyimpanan lokal bisa bersifat sementara (bisa reset saat redeploy/restart).
+Catatan: GitHub Pages hanya untuk file statis. Endpoint API seperti `GET /alumni` dan `POST /track/:id` tetap membutuhkan backend (`server.js`) yang dijalankan di hosting lain atau lokal.
 
 ## Tabel Pengujian
 

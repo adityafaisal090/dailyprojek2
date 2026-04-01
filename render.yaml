@@ -1,8 +1,0 @@
-services:
-  - type: web
-    name: dailyprojek2
-    env: node
-    buildCommand: npm ci
-    startCommand: npm start
-    healthCheckPath: /
-    autoDeploy: true
