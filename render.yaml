@@ -4,7 +4,7 @@ services:
     env: node
     buildCommand: npm ci
     startCommand: npm start
-    healthCheckPath: /
+    healthCheckPath: /healthz
     autoDeploy: true
     envVars:
       - key: NODE_ENV

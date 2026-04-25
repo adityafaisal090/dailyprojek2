@@ -10,6 +10,12 @@ const auth = require('./middleware/auth');
 
 const app = express();
 
+// When running behind a reverse proxy (e.g., Render), trust X-Forwarded-* headers.
+// This is important for secure cookies/sessions to work over HTTPS.
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -22,9 +28,12 @@ app.use(session({
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production' ? 'auto' : false
   }
 }));
+
+// Health check endpoint (used by Render)
+app.get('/healthz', (req, res) => res.status(200).send('ok'));
 
 // Auth endpoints
 app.post('/auth/login', auth.login);
