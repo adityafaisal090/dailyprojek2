@@ -1,4 +1,6 @@
 node_modules/
 .env
 data/*.lock
+data/*.xlsx
+cookies.txt
 .DS_Store

@@ -39,22 +39,60 @@ function normalizeCreatePayload(payload) {
       ? Number(payload.tahunLulus)
       : null,
     email: String(payload.email || '').trim(),
-    noHp: String(payload.noHp || '').trim()
+    noHp: String(payload.noHp || '').trim(),
+
+    // Sosial media pribadi
+    linkedin: String(payload.linkedin || '').trim(),
+    instagram: String(payload.instagram || '').trim(),
+    facebook: String(payload.facebook || '').trim(),
+    tiktok: String(payload.tiktok || '').trim(),
+
+    // Data pekerjaan
+    workTempat: String(payload.workTempat || '').trim(),
+    workAlamat: String(payload.workAlamat || '').trim(),
+    workPosisi: String(payload.workPosisi || '').trim(),
+    workJenis: String(payload.workJenis || '').trim(),
+
+    // Sosial media tempat bekerja
+    workLinkedin: String(payload.workLinkedin || '').trim(),
+    workInstagram: String(payload.workInstagram || '').trim(),
+    workFacebook: String(payload.workFacebook || '').trim(),
+    workTiktok: String(payload.workTiktok || '').trim()
   };
 }
 
 function validateCreatePayload(data) {
   const errors = [];
   if (!data.nama) errors.push('nama wajib diisi');
-  if (!data.jurusan) errors.push('jurusan wajib diisi');
-  if (!Number.isFinite(data.tahunLulus)) errors.push('tahunLulus wajib berupa angka');
   if (!data.email) errors.push('email wajib diisi');
+  if (data.tahunLulus !== null && data.tahunLulus !== undefined && data.tahunLulus !== '') {
+    if (!Number.isFinite(Number(data.tahunLulus))) errors.push('tahunLulus harus berupa angka jika diisi');
+  }
   return errors;
 }
 
 function applyPatch(existing, patch) {
   const out = { ...existing };
-  const allowed = ['nama', 'nim', 'jurusan', 'tahunLulus', 'email', 'noHp'];
+  const allowed = [
+    'nama',
+    'nim',
+    'jurusan',
+    'tahunLulus',
+    'email',
+    'noHp',
+    'linkedin',
+    'instagram',
+    'facebook',
+    'tiktok',
+    'workTempat',
+    'workAlamat',
+    'workPosisi',
+    'workJenis',
+    'workLinkedin',
+    'workInstagram',
+    'workFacebook',
+    'workTiktok'
+  ];
 
   for (const key of allowed) {
     if (patch[key] === undefined) continue;
@@ -66,6 +104,10 @@ function applyPatch(existing, patch) {
   }
 
   return out;
+}
+
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase();
 }
 
 async function getAll() {
@@ -100,6 +142,97 @@ async function create(payload) {
   return alumni;
 }
 
+async function upsertByEmail(payload) {
+  const data = normalizeCreatePayload(payload);
+  const errors = validateCreatePayload(data);
+  if (errors.length) {
+    const err = new Error(errors.join(', '));
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const emailKey = normalizeEmail(data.email);
+  if (!emailKey) {
+    const err = new Error('email wajib diisi');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const items = await readAll();
+  const idx = items.findIndex((a) => normalizeEmail(a.email) === emailKey);
+  const now = new Date().toISOString();
+
+  if (idx === -1) {
+    const alumni = {
+      id: crypto.randomUUID(),
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+      lastTracking: null
+    };
+    items.push(alumni);
+    await writeAll(items);
+    return { action: 'created', item: alumni };
+  }
+
+  const next = applyPatch(items[idx], data);
+  next.updatedAt = now;
+  items[idx] = next;
+  await writeAll(items);
+  return { action: 'updated', item: next };
+}
+
+function normalizeNim(nim) {
+  return String(nim || '').trim();
+}
+
+async function importUpsert(payload) {
+  const data = normalizeCreatePayload(payload);
+
+  // Import mode: allow email kosong (karena sumber data bisa hanya punya NIM)
+  // Minimal: nama + (email atau nim)
+  if (!data.nama) {
+    const err = new Error('nama wajib diisi');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const emailKey = normalizeEmail(data.email);
+  const nimKey = normalizeNim(data.nim);
+  if (!emailKey && !nimKey) {
+    const err = new Error('email atau nim wajib diisi');
+    err.statusCode = 400;
+    throw err;
+  }
+
+  const items = await readAll();
+  const now = new Date().toISOString();
+
+  const idx = items.findIndex((a) => {
+    if (emailKey) return normalizeEmail(a.email) === emailKey;
+    return normalizeNim(a.nim) === nimKey;
+  });
+
+  if (idx === -1) {
+    const alumni = {
+      id: crypto.randomUUID(),
+      ...data,
+      createdAt: now,
+      updatedAt: now,
+      lastTracking: null
+    };
+    items.push(alumni);
+    await writeAll(items);
+    return { action: 'created', item: alumni };
+  }
+
+  const next = applyPatch(items[idx], data);
+  next.updatedAt = now;
+  items[idx] = next;
+  await writeAll(items);
+  return { action: 'updated', item: next };
+}
+
 async function update(id, patch) {
   const items = await readAll();
   const idx = items.findIndex((a) => a.id === id);
@@ -113,8 +246,13 @@ async function update(id, patch) {
     err.statusCode = 400;
     throw err;
   }
-  if (next.jurusan !== undefined && String(next.jurusan).trim() === '') {
-    const err = new Error('jurusan tidak boleh kosong');
+  if (patch.email !== undefined && String(next.email || '').trim() === '') {
+    const err = new Error('email tidak boleh kosong');
+    err.statusCode = 400;
+    throw err;
+  }
+  if (patch.tahunLulus !== undefined && next.tahunLulus !== null && !Number.isFinite(Number(next.tahunLulus))) {
+    const err = new Error('tahunLulus harus berupa angka jika diisi');
     err.statusCode = 400;
     throw err;
   }
@@ -152,6 +290,8 @@ module.exports = {
   getAll,
   getById,
   create,
+  upsertByEmail,
+  importUpsert,
   update,
   remove,
   setTracking

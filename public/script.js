@@ -6,6 +6,7 @@ const lastTrackingEl = document.getElementById('lastTracking');
 const trackingCard = document.getElementById('trackingCard');
 const searchInput = document.getElementById('searchInput');
 const btnRefresh = document.getElementById('btnRefresh');
+const btnLogout = document.getElementById('btnLogout');
 
 let alumniCache = [];
 
@@ -25,6 +26,15 @@ function showAlert(type, message) {
       wrapper.remove();
     } catch {}
   }, 3500);
+}
+
+async function logout() {
+  const res = await fetch('/auth/logout', { method: 'POST' });
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    return;
+  }
+  window.location.href = '/login.html';
 }
 
 function setTrackingCardLoading(isLoading, label = 'Memproses pelacakan...') {
@@ -132,6 +142,10 @@ function filteredItems() {
 
 async function fetchAlumni() {
   const res = await fetch('/alumni');
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    return [];
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || 'Gagal memuat alumni');
   return json.data;
@@ -143,6 +157,10 @@ async function createAlumni(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    return null;
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || 'Gagal menambah alumni');
   return json.data;
@@ -150,6 +168,10 @@ async function createAlumni(payload) {
 
 async function trackAlumni(id) {
   const res = await fetch(`/track/${encodeURIComponent(id)}`, { method: 'POST' });
+  if (res.status === 401) {
+    window.location.href = '/login.html';
+    return null;
+  }
   const json = await res.json();
   if (!res.ok) throw new Error(json.message || 'Gagal melacak alumni');
   return json.data;
@@ -185,6 +207,14 @@ btnRefresh.addEventListener('click', async () => {
     showAlert('success', 'Data berhasil diperbarui');
   } catch (err) {
     showAlert('danger', err.message || 'Gagal refresh');
+  }
+});
+
+btnLogout.addEventListener('click', async () => {
+  try {
+    await logout();
+  } catch {
+    window.location.href = '/login.html';
   }
 });
 

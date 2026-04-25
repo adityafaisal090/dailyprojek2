@@ -4,6 +4,12 @@ Aplikasi sederhana untuk mengelola data alumni dan melakukan simulasi pelacakan 
 
 ## Fitur
 
+- Login untuk melindungi sistem
+  - Halaman utama (`/`) dan endpoint API (`/alumni`, `/track`) hanya bisa diakses setelah login
+  - Kredensial default:
+    - ID: `rekayasa kebutuhan`
+    - Password: `tugas4090`
+
 - CRUD data alumni
   - `GET /alumni`
   - `POST /alumni`
@@ -23,6 +29,8 @@ Aplikasi sederhana untuk mengelola data alumni dan melakukan simulasi pelacakan 
 
 - Node.js (disarankan Node 18+)
 - Express
+- express-session (login)
+- exceljs (parser Excel)
 - CORS
 - Penyimpanan data: JSON file (`data/alumni.json`)
 - Frontend: HTML, CSS, JavaScript, Bootstrap 5
@@ -60,6 +68,36 @@ npm run dev
 
 - Frontend: `http://localhost:3000/`
 - API: `http://localhost:3000/alumni`
+
+Catatan: aplikasi meminta login terlebih dahulu.
+
+## Cara Import File Excel (tanpa upload dari UI)
+
+Mode import Excel dilakukan dengan cara menaruh file `.xlsx` langsung ke folder project, lalu menjalankan script CLI.
+
+1. Taruh file Excel di folder `data/` (contoh: `data/alumni.xlsx`).
+2. Jalankan:
+
+```bash
+npm run import:alumni -- data/alumni.xlsx
+```
+
+Catatan:
+
+- Format didukung: `.xlsx`.
+- Perilaku: **upsert by email** (email sama → update; email baru → create).
+- Minimal kolom per baris: `Nama` dan `Email`.
+
+Header kolom bersifat fleksibel (case-insensitive). Contoh yang dikenali:
+
+- `Email`
+- `No HP` / `HP` / `WhatsApp`
+- `LinkedIn`, `IG` / `Instagram`, `FB` / `Facebook`, `TikTok`
+- `Tempat Bekerja` / `Perusahaan` / `Instansi`
+- `Alamat Bekerja`
+- `Posisi` / `Jabatan`
+- `Jenis` (di-normalisasi ke: `PNS`, `Swasta`, `Wirausaha` bila terdeteksi)
+- Sosmed tempat kerja: `LinkedIn Perusahaan`, `Instagram Perusahaan`, `Facebook Perusahaan`, `TikTok Perusahaan`
 
 ## Struktur Folder
 
