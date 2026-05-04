@@ -1,22 +1,39 @@
 const fs = require('fs/promises');
 const path = require('path');
 const crypto = require('crypto');
+const os = require('os');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const DATA_FILE = path.join(DATA_DIR, 'alumni.json');
+const BUNDLED_DATA_DIR = path.join(__dirname, '..', 'data');
+const BUNDLED_DATA_FILE = path.join(BUNDLED_DATA_DIR, 'alumni.json');
+
+// Vercel/serverless runtime has a read-only project filesystem.
+// Use a writable temp dir and seed it once from the bundled JSON.
+const RUNTIME_DATA_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), 'daily-project-3')
+  : BUNDLED_DATA_DIR;
+const RUNTIME_DATA_FILE = path.join(RUNTIME_DATA_DIR, 'alumni.json');
 
 async function ensureDataFile() {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.mkdir(RUNTIME_DATA_DIR, { recursive: true });
   try {
-    await fs.access(DATA_FILE);
+    await fs.access(RUNTIME_DATA_FILE);
   } catch {
-    await fs.writeFile(DATA_FILE, JSON.stringify([], null, 2), 'utf8');
+    // Seed on first run (best-effort)
+    let initial = [];
+    try {
+      const raw = await fs.readFile(BUNDLED_DATA_FILE, 'utf8');
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) initial = parsed;
+    } catch {
+      // ignore
+    }
+    await fs.writeFile(RUNTIME_DATA_FILE, JSON.stringify(initial, null, 2), 'utf8');
   }
 }
 
 async function readAll() {
   await ensureDataFile();
-  const raw = await fs.readFile(DATA_FILE, 'utf8');
+  const raw = await fs.readFile(RUNTIME_DATA_FILE, 'utf8');
   try {
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -27,7 +44,7 @@ async function readAll() {
 
 async function writeAll(items) {
   await ensureDataFile();
-  await fs.writeFile(DATA_FILE, JSON.stringify(items, null, 2), 'utf8');
+  await fs.writeFile(RUNTIME_DATA_FILE, JSON.stringify(items, null, 2), 'utf8');
 }
 
 function normalizeCreatePayload(payload) {
