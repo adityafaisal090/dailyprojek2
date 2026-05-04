@@ -42,9 +42,9 @@ async function fileExists(filePath) {
       if (skipped.length < MAX_SKIPPED_SAMPLES) skipped.push({ row: rowObj.__rowNumber ?? null, reason: 'nama kosong' });
       continue;
     }
-    if (!payload.email && !payload.nim) {
+    if (!payload.nim) {
       skippedCount++;
-      if (skipped.length < MAX_SKIPPED_SAMPLES) skipped.push({ row: rowObj.__rowNumber ?? null, reason: 'email dan nim kosong' });
+      if (skipped.length < MAX_SKIPPED_SAMPLES) skipped.push({ row: rowObj.__rowNumber ?? null, reason: 'nim kosong' });
       continue;
     }
 

@@ -63,17 +63,9 @@
             <label class="form-label">Jurusan</label>
             <input name="jurusan" class="form-control" placeholder="Jurusan" required />
           </div>
-          <div class="col-12 col-md-3">
+          <div class="col-12 col-md-6">
             <label class="form-label">Tahun Lulus</label>
             <input name="tahunLulus" type="number" class="form-control" placeholder="2024" required />
-          </div>
-          <div class="col-12 col-md-3">
-            <label class="form-label">No HP (opsional)</label>
-            <input name="noHp" class="form-control" placeholder="08xxxxxxxxxx" />
-          </div>
-          <div class="col-12 col-md-6">
-            <label class="form-label">Email</label>
-            <input name="email" type="email" class="form-control" placeholder="nama@email.com" required />
           </div>
           <div class="col-12 d-flex gap-2">
             <button class="btn btn-primary" type="submit">Tambah Alumni</button>
@@ -81,6 +73,16 @@
           </div>
         </div>
       </form>
+    </section>
+
+    <!-- Hasil pelacakan -->
+    <section class="mb-4">
+      <h4>Hasil Pelacakan</h4>
+      <div id="trackingCard" class="card">
+        <div class="card-body">
+          <div class="text-secondary">Klik tombol "Lacak Alumni" pada tabel.</div>
+        </div>
+      </div>
     </section>
 
     <!-- Tabel data alumni -->
@@ -96,24 +98,13 @@
               <th>Nama</th>
               <th>Jurusan</th>
               <th>Tahun</th>
-              <th>Email</th>
               <th style="width: 160px">Aksi</th>
             </tr>
           </thead>
           <tbody id="alumniTableBody">
-            <tr><td colspan="5" class="text-center text-secondary">Memuat...</td></tr>
+            <tr><td colspan="4" class="text-center text-secondary">Memuat...</td></tr>
           </tbody>
         </table>
-      </div>
-    </section>
-
-    <!-- Hasil pelacakan -->
-    <section class="mb-5">
-      <h4>Hasil Pelacakan</h4>
-      <div id="trackingCard" class="card">
-        <div class="card-body">
-          <div class="text-secondary">Klik tombol "Lacak Alumni" pada tabel.</div>
-        </div>
       </div>
     </section>
   </main>

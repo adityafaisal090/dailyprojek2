@@ -77,34 +77,6 @@ function isNonEmpty(v) {
   return v !== null && v !== undefined && String(v).trim() !== '';
 }
 
-function isValidEmail(email) {
-  const e = String(email || '').trim();
-  if (!e) return false;
-  // Practical (not perfect) email check for data validation.
-  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
-}
-
-function isLikelyUrl(url) {
-  const s = String(url || '').trim();
-  if (!s) return true; // treat empty as ok
-  try {
-    // Accept urls without protocol by adding https:// for validation only.
-    // eslint-disable-next-line no-new
-    new URL(s.includes('://') ? s : `https://${s}`);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function isLikelyPhone(phone) {
-  const s = String(phone || '').trim();
-  if (!s) return true;
-  const normalized = s.replace(/[^0-9+]/g, '');
-  const digits = normalized.replace(/\D/g, '');
-  return digits.length >= 9 && digits.length <= 15;
-}
-
 function computeDataPoints(items, fields) {
   let total = 0;
   for (const a of items) {
@@ -117,34 +89,21 @@ function computeDataPoints(items, fields) {
 
 function completenessCountCore(a) {
   const hasNama = isNonEmpty(a && a.nama) ? 1 : 0;
-  const hasContact = (isNonEmpty(a && a.email) || isNonEmpty(a && a.nim)) ? 1 : 0;
+  const hasNim = isNonEmpty(a && a.nim) ? 1 : 0;
   const hasJurusan = isNonEmpty(a && a.jurusan) ? 1 : 0;
   const hasTahun = isNonEmpty(a && a.tahunLulus) ? 1 : 0;
-  return hasNama + hasContact + hasJurusan + hasTahun;
+  return hasNama + hasNim + hasJurusan + hasTahun;
 }
 
 function isRecordAccurate(a, currentYear) {
   if (!isNonEmpty(a && a.nama)) return false;
   if (!isNonEmpty(a && a.jurusan)) return false;
 
-  const hasEmail = isNonEmpty(a && a.email);
-  const hasNim = isNonEmpty(a && a.nim);
-  if (!hasEmail && !hasNim) return false;
-  if (hasEmail && !isValidEmail(a.email)) return false;
-
-  if (isNonEmpty(a && a.noHp) && !isLikelyPhone(a.noHp)) return false;
-
   // If tahunLulus filled, it should be reasonable.
   if (isNonEmpty(a && a.tahunLulus)) {
     const n = Number(a.tahunLulus);
     if (!Number.isFinite(n)) return false;
     if (n < 1970 || n > currentYear + 1) return false;
-  }
-
-  // If URL-ish fields exist, validate shape.
-  const urls = [a.linkedin, a.instagram, a.facebook, a.tiktok, a.workLinkedin, a.workInstagram, a.workFacebook, a.workTiktok];
-  for (const u of urls) {
-    if (!isLikelyUrl(u)) return false;
   }
 
   return true;
@@ -155,21 +114,7 @@ function computeQualityReport(items, opts = {}) {
     'nama',
     'nim',
     'jurusan',
-    'tahunLulus',
-    'email',
-    'noHp',
-    'linkedin',
-    'instagram',
-    'facebook',
-    'tiktok',
-    'workTempat',
-    'workAlamat',
-    'workPosisi',
-    'workJenis',
-    'workLinkedin',
-    'workInstagram',
-    'workFacebook',
-    'workTiktok'
+    'tahunLulus'
   ];
 
   const coverageDataPoints = computeDataPoints(items, fieldsForCoverage);

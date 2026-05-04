@@ -28,15 +28,6 @@ function normalizeCellValue(v) {
   return String(v).trim();
 }
 
-function normalizeWorkJenis(v) {
-  const raw = normalizeText(v).toLowerCase();
-  if (!raw) return '';
-  if (raw.includes('pns') || raw.includes('asn') || raw.includes('negeri')) return 'PNS';
-  if (raw.includes('wira') || raw.includes('usaha') || raw.includes('entre')) return 'Wirausaha';
-  if (raw.includes('swasta') || raw.includes('private')) return 'Swasta';
-  return normalizeText(v);
-}
-
 function buildHeaderIndex(rowObj) {
   const idx = new Map();
   for (const key of Object.keys(rowObj || {})) {
@@ -77,25 +68,7 @@ function mapRowToPayload(rowObj) {
       if (!m) return null;
       const year = Number(m[1]);
       return Number.isFinite(year) ? year : null;
-    })(),
-
-    email: normalizeText(getCell(rowObj, headerIndex, ['email', 'e-mail', 'mail'])),
-    noHp: normalizeText(getCell(rowObj, headerIndex, ['nohp', 'no hp', 'hp', 'nohandphone', 'handphone', 'telepon', 'telp', 'phone', 'wa', 'whatsapp'])),
-
-    linkedin: normalizeText(getCell(rowObj, headerIndex, ['linkedin', 'linkedinurl', 'linklinkedin'])),
-    instagram: normalizeText(getCell(rowObj, headerIndex, ['ig', 'instagram', 'instagramurl'])),
-    facebook: normalizeText(getCell(rowObj, headerIndex, ['fb', 'facebook', 'facebookurl'])),
-    tiktok: normalizeText(getCell(rowObj, headerIndex, ['tiktok', 'tik tok', 'tiktokurl'])),
-
-    workTempat: normalizeText(getCell(rowObj, headerIndex, ['tempatbekerja', 'tempat bekerja', 'perusahaan', 'company', 'instansi', 'kantor'])),
-    workAlamat: normalizeText(getCell(rowObj, headerIndex, ['alamatbekerja', 'alamat bekerja', 'alamatkantor', 'alamat kantor', 'alamatperusahaan', 'alamat perusahaan', 'officeaddress'])),
-    workPosisi: normalizeText(getCell(rowObj, headerIndex, ['posisi', 'jabatan', 'jobtitle', 'role'])),
-    workJenis: normalizeWorkJenis(getCell(rowObj, headerIndex, ['jenis', 'jenispekerjaan', 'status', 'kategori', 'tipe', 'pns', 'swasta', 'wirausaha', 'pns/swasta/wirausaha'])),
-
-    workLinkedin: normalizeText(getCell(rowObj, headerIndex, ['linkedinperusahaan', 'linkedin perusahaan', 'linkedinkantor', 'linkedin kantor', 'worklinkedin', 'linkedintempatbekerja'])),
-    workInstagram: normalizeText(getCell(rowObj, headerIndex, ['igperusahaan', 'instagramperusahaan', 'instagram perusahaan', 'igkantor', 'instagramkantor', 'workinstagram'])),
-    workFacebook: normalizeText(getCell(rowObj, headerIndex, ['fbperusahaan', 'facebookperusahaan', 'facebook perusahaan', 'fbkantor', 'facebookkantor', 'workfacebook'])),
-    workTiktok: normalizeText(getCell(rowObj, headerIndex, ['tiktokperusahaan', 'tiktok perusahaan', 'tiktokkantor', 'tiktok kantor', 'worktiktok']))
+    })()
   };
 }
 

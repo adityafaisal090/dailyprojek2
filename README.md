@@ -77,23 +77,6 @@ Catatan: aplikasi meminta login terlebih dahulu.
 
 GitHub Pages cocok untuk proyek yang **tanpa backend**. Proyek ini memakai Express (login + API), jadi GitHub Pages hanya akan menampilkan halaman HTML/CSS/JS dan **endpoint seperti** `/auth/*`, `/alumni`, `/track` **tidak akan jalan**.
 
-### Opsi B — Render (disarankan untuk proyek ini)
-
-Repo ini sudah menyiapkan konfigurasi Render di `render.yaml`.
-
-Langkah singkat:
-
-1. Push project ke GitHub.
-2. Buka Render → **New** → **Blueprint** → pilih repo ini.
-3. Render akan membaca `render.yaml`, lalu klik **Apply** / **Deploy**.
-4. Setelah selesai, kamu dapat URL semacam `https://<nama-service>.onrender.com`.
-
-Catatan:
-
-- Di konfigurasi, `SESSION_SECRET` dibuat otomatis oleh Render.
-- Folder `data/` dipasang sebagai **persistent disk** supaya `data/alumni.json` tidak hilang saat restart.
-- Paket free biasanya bisa sleep saat idle (cold start). Untuk benar-benar selalu responsif 24/7, pakai plan berbayar atau uptime monitor.
-
 ## Cara Import File Excel (tanpa upload dari UI)
 
 Mode import Excel dilakukan dengan cara menaruh file `.xlsx` langsung ke folder project, lalu menjalankan script CLI.
@@ -108,19 +91,15 @@ npm run import:alumni -- data/alumni.xlsx
 Catatan:
 
 - Format didukung: `.xlsx`.
-- Perilaku: **upsert by email** (email sama → update; email baru → create).
-- Minimal kolom per baris: `Nama` dan `Email`.
+- Perilaku: **upsert by NIM** (NIM sama → update; NIM baru → create).
+- Minimal kolom per baris: `Nama` dan `NIM`.
 
 Header kolom bersifat fleksibel (case-insensitive). Contoh yang dikenali:
 
-- `Email`
-- `No HP` / `HP` / `WhatsApp`
-- `LinkedIn`, `IG` / `Instagram`, `FB` / `Facebook`, `TikTok`
-- `Tempat Bekerja` / `Perusahaan` / `Instansi`
-- `Alamat Bekerja`
-- `Posisi` / `Jabatan`
-- `Jenis` (di-normalisasi ke: `PNS`, `Swasta`, `Wirausaha` bila terdeteksi)
-- Sosmed tempat kerja: `LinkedIn Perusahaan`, `Instagram Perusahaan`, `Facebook Perusahaan`, `TikTok Perusahaan`
+- `Nama`
+- `NIM`
+- `Jurusan` / `Prodi` / `Program Studi`
+- `Tahun Lulus` / `Tahun`
 
 ## Struktur Folder
 

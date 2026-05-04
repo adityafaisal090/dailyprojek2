@@ -29,7 +29,7 @@ function showAlert(type, message) {
 }
 
 async function logout() {
-  const res = await fetch('/auth/logout', { method: 'POST' });
+  const res = await fetch('/auth/logout', { method: 'POST', credentials: 'include' });
   if (res.status === 401) {
     window.location.href = '/login.html';
     return;
@@ -88,6 +88,12 @@ function escapeHtml(str) {
     .replaceAll("'", '&#039;');
 }
 
+function renderValue(value) {
+  const text = String(value ?? '').trim();
+  if (!text) return '<span class="text-secondary">-</span>';
+  return escapeHtml(text);
+}
+
 function updateDashboard(items) {
   totalAlumniEl.textContent = items.length;
 
@@ -106,7 +112,7 @@ function updateDashboard(items) {
 
 function renderTable(items) {
   if (!items.length) {
-    alumniTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-secondary">Belum ada data alumni</td></tr>`;
+    alumniTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-secondary">Belum ada data alumni</td></tr>`;
     return;
   }
 
@@ -118,7 +124,6 @@ function renderTable(items) {
       </td>
       <td>${escapeHtml(a.jurusan)}</td>
       <td>${a.tahunLulus ?? ''}</td>
-      <td>${escapeHtml(a.email)}</td>
       <td>
         <button class="btn btn-sm btn-success btn-track" data-id="${a.id}">
           <span class="label">Lacak Alumni</span>
@@ -134,14 +139,14 @@ function filteredItems() {
   return alumniCache.filter((a) => {
     return (
       String(a.nama || '').toLowerCase().includes(q) ||
-      String(a.jurusan || '').toLowerCase().includes(q) ||
-      String(a.email || '').toLowerCase().includes(q)
+      String(a.nim || '').toLowerCase().includes(q) ||
+      String(a.jurusan || '').toLowerCase().includes(q)
     );
   });
 }
 
 async function fetchAlumni() {
-  const res = await fetch('/alumni');
+  const res = await fetch('/alumni', { credentials: 'include' });
   if (res.status === 401) {
     window.location.href = '/login.html';
     return [];
@@ -155,6 +160,7 @@ async function createAlumni(payload) {
   const res = await fetch('/alumni', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
     body: JSON.stringify(payload)
   });
   if (res.status === 401) {
@@ -167,8 +173,13 @@ async function createAlumni(payload) {
 }
 
 async function trackAlumni(id) {
-  const res = await fetch(`/track/${encodeURIComponent(id)}`, { method: 'POST' });
+  const res = await fetch(`/track/${encodeURIComponent(id)}`, { method: 'POST', credentials: 'include' });
   if (res.status === 401) {
+    console.error('[TRACK_DEBUG] Unauthorized 401 response:', {
+      status: res.status,
+      url: `/track/${id}`,
+      timestamp: new Date().toISOString()
+    });
     window.location.href = '/login.html';
     return null;
   }
@@ -261,6 +272,6 @@ alumniTableBody.addEventListener('click', async (e) => {
     await refresh();
   } catch (err) {
     showAlert('danger', err.message || 'Gagal memuat data awal');
-    alumniTableBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Gagal memuat data</td></tr>`;
+    alumniTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Gagal memuat data</td></tr>`;
   }
 })();
